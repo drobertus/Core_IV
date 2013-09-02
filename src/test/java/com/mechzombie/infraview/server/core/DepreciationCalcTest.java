@@ -19,17 +19,25 @@ public class DepreciationCalcTest {
 
         double replacementLife = 10;
 
-        Double futureStatus = calculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 0.0);
+        Double futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 0.0);
 
         assertEquals(Double.valueOf(10), futureStatus);
 
-        futureStatus = calculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 10.0);
+        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 10.0);
 
         assertEquals(Double.valueOf(5), futureStatus);
 
-        futureStatus = calculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 5.0);
+        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 5.0);
 
         assertEquals(Double.valueOf(7.5), futureStatus);
 
+
+        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 20.0);
+
+        assertEquals(Double.valueOf(0.0), futureStatus);
+
+        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 25.0);
+
+        assertEquals(Double.valueOf(0.0), futureStatus);
     }
 }
