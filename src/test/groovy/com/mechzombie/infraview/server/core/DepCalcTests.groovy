@@ -1,18 +1,17 @@
 package com.mechzombie.infraview.server.core
 
-/**
- * Created with IntelliJ IDEA.
- * User: david
- * Date: 9/1/13
- * Time: 5:44 PM
- * To change this template use File | Settings | File Templates.
- */
-class DepCalcTests extends spock.lang.Specification {
-    //double currentStatus, int newStatus, int destroyedStatus, int replacementStatus, double replacementTimeYrs, double yearsAhead
+import spock.lang.Specification
 
-    def "basic projected status of asset class"() {
+/**
+ * Test the DepreciationCalculator- this is the core
+ * of replacement scheduling and budgeting
+ */
+class DepCalcTests extends Specification {
+
+
+    def "basic projected status of asset"() {
         expect:
-        futureValue == DepreciationCalculator.getFutureValue(currentStatus, newStatus, destoyedStatus, replacementStatus, replacementTimeYrs, yearsAhead)
+        futureValue == DepreciationCalculator.getFutureStatus(currentStatus, newStatus, destoyedStatus, replacementStatus, replacementTimeYrs, yearsAhead)
 
         where:
         currentStatus | futureValue | newStatus | destoyedStatus | replacementStatus | replacementTimeYrs | yearsAhead
@@ -24,7 +23,6 @@ class DepCalcTests extends spock.lang.Specification {
     }
 
     def "count the number of replacements needed over a span of time"() {
-
 
         expect:
         replacementCount == DepreciationCalculator.getProjectedTimesToReplace(currentStatus, newStatus, replacementStatus, replacementTimeYrs, yearsAhead)
@@ -50,6 +48,29 @@ class DepCalcTests extends spock.lang.Specification {
         7.5           | 10        | 5                 | 4.5                | 10         | 2
         5.5           | 10        | 5                 | 4.4                | 10         | 3
         7.5           | 10        | 5                 | 4.6                | 10         | 2
+        10            | 10        | 5                 | 0.25               | 0.4        | 1
+        10            | 10        | 5                 | 0.25               | 0.5        | 2
+        10            | 10        | 5                 | 0.25               | 0.2        | 0
+    }
+
+    def "evaluate replacement cost over time"() {
+        expect:
+        replacementCost == DepreciationCalculator.cumulativeReplacementCostOverTime(timesToReplace,
+                yearsBetweenReplacement, yearsToFirstReplacement, currentReplacementCost, projectedInflationRate)
+
+        where:
+        replacementCost | timesToReplace | yearsBetweenReplacement | yearsToFirstReplacement | currentReplacementCost | projectedInflationRate
+        100             | 1              | 1                       | 0                       | 100                    | 0
+        100             | 1              | 10                      | 0                       | 100                    | 0
+        100             | 1              | 1                       | 0                       | 100                    | 0.50
+        150             | 1              | 5                       | 1                       | 100                    | 0.50
+        200             | 2              | 1                       | 0                       | 100                    | 0
+        204.71          | 1              | 80                      | 72                      | 100                    | 0.01
+        304.71          | 2              | 72                      | 0                       | 100                    | 0.01
+        2500            | 25             | 0.5                     | 0.08                    | 100                    | 0
+        200.5           | 2              | 0.5                     | 0                       | 100                    | 0.01
+        201.5           | 2              | 0.5                     | 0.5                     | 100                    | 0.01
+        1022.74         | 10             | 0.5                     | 0                       | 100                    | 0.01
     }
 
 }

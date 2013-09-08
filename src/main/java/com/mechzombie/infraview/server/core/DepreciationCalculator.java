@@ -1,9 +1,14 @@
 package com.mechzombie.infraview.server.core;
 
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class DepreciationCalculator {
 
-    public static double getFutureValue(double currentStatus, int newStatus, int destroyedStatus, int replacementStatus, double replacementTimeYrs, double yearsAhead) {
+    private static final int moneyPrecision = 2;
+
+    public static double getFutureStatus(double currentStatus, int newStatus, int destroyedStatus, int replacementStatus, double replacementTimeYrs, double yearsAhead) {
 
         double reductionPerYear = (newStatus - replacementStatus) / replacementTimeYrs;
 
@@ -28,11 +33,6 @@ public class DepreciationCalculator {
         double statusUnitsLostPerYear = statusUnitsFromNewToReplace / replacementTimeYrs;
         double yearsForOneUnitOfStatusLost = 1 / statusUnitsLostPerYear;
 
-        //double annualReplacementRate = 1 / replacementTimeYrs;
-        //double replacements = annualReplacementRate * yearsAhead;
-
-        //double reductionPerYear = (newStatus - replacementStatus) / replacementTimeYrs;
-
         double yearsToFirstReplace;
         //if the asset needs to be replaced this year then
         if (currentStatus <= replacementStatus) {
@@ -55,5 +55,20 @@ public class DepreciationCalculator {
         return replacementCount;
     }
 
+    public static double cumulativeReplacementCostOverTime(int timesToReplace, double yearsBetweenReplacement, double yearsToFirstReplacement, double currentReplacementCost, double projectedInflationRate) {
 
+        double cumulativeCost = 0.0;
+
+        for (int i = 0; i < timesToReplace; i++) {
+            cumulativeCost += compoundedRate(currentReplacementCost, projectedInflationRate, yearsToFirstReplacement + (i * yearsBetweenReplacement));
+            //System.out.println("cumulativeCost =" + cumulativeCost);
+        }
+        return new BigDecimal(cumulativeCost).setScale(moneyPrecision, RoundingMode.HALF_EVEN).doubleValue();
+    }
+
+    public static double compoundedRate(double principal, double rate, double years) {
+        double amount = principal * Math.pow(1.0 + rate, years);
+        //System.out.println("compounded val=" + amount);
+        return new BigDecimal(amount).setScale(moneyPrecision, RoundingMode.HALF_EVEN).doubleValue();
+    }
 }
