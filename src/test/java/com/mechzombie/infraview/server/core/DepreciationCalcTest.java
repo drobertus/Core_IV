@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 public class DepreciationCalcTest {
 
-    private DepreciationCalculator calculator = new DepreciationCalculator();
 
     @Test
     public void testDepreciationBasic() {
@@ -19,24 +18,24 @@ public class DepreciationCalcTest {
 
         double replacementLife = 10;
 
-        Double futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 0.0);
+        Double futureStatus = DepreciationCalculator.getFutureStatus(currentStatus, top, destroyed, replacement, replacementLife, 0.0);
 
         assertEquals(Double.valueOf(10), futureStatus);
 
-        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 10.0);
+        futureStatus = DepreciationCalculator.getFutureStatus(currentStatus, top, destroyed, replacement, replacementLife, 10.0);
 
         assertEquals(Double.valueOf(5), futureStatus);
 
-        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 5.0);
+        futureStatus = DepreciationCalculator.getFutureStatus(currentStatus, top, destroyed, replacement, replacementLife, 5.0);
 
         assertEquals(Double.valueOf(7.5), futureStatus);
 
 
-        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 20.0);
+        futureStatus = DepreciationCalculator.getFutureStatus(currentStatus, top, destroyed, replacement, replacementLife, 20.0);
 
         assertEquals(Double.valueOf(0.0), futureStatus);
 
-        futureStatus = DepreciationCalculator.getFutureValue(currentStatus, top, destroyed, replacement, replacementLife, 25.0);
+        futureStatus = DepreciationCalculator.getFutureStatus(currentStatus, top, destroyed, replacement, replacementLife, 25.0);
 
         assertEquals(Double.valueOf(0.0), futureStatus);
     }
