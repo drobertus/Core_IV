@@ -40,7 +40,8 @@ public class DepreciationCalculator {
      * @param replacementStatus
      * @param replacementTimeYrs
      * @param yearsAhead
-     * @return
+     * @return the number of times that an asset can be expected to be replaced over a period of time
+     * given a starting status and fixed replaced period
      */
     public static int getProjectedTimesToReplace(double currentStatus, int newStatus, int replacementStatus, double replacementTimeYrs, double yearsAhead) {
 
