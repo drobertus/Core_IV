@@ -22,10 +22,8 @@ public class DepreciationCalculator {
      */
     public static double getFutureStatus(double currentStatus, int newStatus, int destroyedStatus, int replacementStatus, double replacementTimeYrs, double yearsAhead) {
 
-        double reductionPerYear = (newStatus - replacementStatus) / replacementTimeYrs;
-
-        double reductionOverTime = reductionPerYear * yearsAhead;
-
+        double statusReductionPerYear = (newStatus - replacementStatus) / replacementTimeYrs;
+        double reductionOverTime = statusReductionPerYear * yearsAhead;
         double futureVal = currentStatus - reductionOverTime;
 
         if (futureVal < destroyedStatus) {
@@ -34,7 +32,22 @@ public class DepreciationCalculator {
         return futureVal;
     }
 
+
+    public static double getYearsToNextReplacement(double currentStatus, double replacementStatus, double newStatus, double yearsToReplace) {
+
+        if (currentStatus <= replacementStatus) {
+            return 0.0;
+        }
+
+        double depreciationPerYear = (newStatus - replacementStatus) / yearsToReplace;
+        double statusToReplace = currentStatus - replacementStatus;
+
+        return statusToReplace / depreciationPerYear;
+    }
     /**
+     * This function computed the number of times that an asset will need to be replaced
+     * over a span of time given its current status.  It assumes a standard replacement time
+     *
      * @param currentStatus
      * @param newStatus
      * @param replacementStatus
@@ -48,29 +61,17 @@ public class DepreciationCalculator {
         int replacementCount = 0;
         //first see the time from current to replacement
         double yearsRemaining = yearsAhead;
-
-        int statusUnitsFromNewToReplace = newStatus - replacementStatus;
-        double statusUnitsLostPerYear = statusUnitsFromNewToReplace / replacementTimeYrs;
-        double yearsForOneUnitOfStatusLost = 1 / statusUnitsLostPerYear;
-
-        double yearsToFirstReplace;
         //if the asset needs to be replaced this year then
         if (currentStatus <= replacementStatus) {
-            yearsToFirstReplace = 0.0;
+            replacementCount ++;
         } else {
-            yearsToFirstReplace = yearsForOneUnitOfStatusLost * (currentStatus - replacementStatus);
+            double yearsToFirstReplace = DepreciationCalculator.getYearsToNextReplacement(currentStatus, replacementStatus, newStatus, replacementTimeYrs);
+            if (yearsToFirstReplace <= yearsAhead) {
+                yearsRemaining -= yearsToFirstReplace;
+                replacementCount ++;
+            }
         }
-
-        if (yearsToFirstReplace > yearsAhead) {
-            return 0;
-        } else {
-            replacementCount++;
-            yearsRemaining -= yearsToFirstReplace;
-        }
-
-        int additionalTimesToReplace = (int) Math.floor(yearsRemaining / replacementTimeYrs);
-
-        replacementCount = replacementCount + additionalTimesToReplace;
+        replacementCount += new Double(yearsRemaining/replacementTimeYrs).intValue();
 
         return replacementCount;
     }
@@ -90,7 +91,6 @@ public class DepreciationCalculator {
 
         for (int i = 0; i < timesToReplace; i++) {
             cumulativeCost += compoundedRate(currentReplacementCost, projectedInflationRate, yearsToFirstReplacement + (i * yearsBetweenReplacement));
-            //System.out.println("cumulativeCost =" + cumulativeCost);
         }
         return new BigDecimal(cumulativeCost).setScale(moneyPrecision, RoundingMode.HALF_EVEN).doubleValue();
     }

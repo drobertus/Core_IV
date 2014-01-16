@@ -15,6 +15,8 @@ class DepCalcTests extends Specification {
 
         where:
         currentStatus | futureValue | newStatus | destoyedStatus | replacementStatus | replacementTimeYrs | yearsAhead
+        10            | 10.0        | 10        | 0              | 5                 | 10                 | 0
+        10            | 9.5         | 10        | 0              | 5                 | 10                 | 1
         10            | 7.5         | 10        | 0              | 5                 | 10                 | 5
         10            | 5           | 10        | 0              | 5                 | 10                 | 10
         10            | 0           | 10        | 0              | 5                 | 10                 | 20
